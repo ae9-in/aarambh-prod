@@ -85,6 +85,12 @@ export default function LearnHomePage() {
   const [newCourses, setNewCourses] = useState<
     { id: string; title: string; category: string; duration: string; type: string }[]
   >([])
+  const [featuredCategory, setFeaturedCategory] = useState<{
+    id: string
+    name: string
+    lessons: number
+    totalMinutes: number
+  } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -102,11 +108,17 @@ export default function LearnHomePage() {
         setIsLoading(true)
         setError(null)
 
+        const search = new URLSearchParams({
+          orgId: user.orgId,
+          ...(user.id ? { userId: user.id } : {}),
+          ...(user.role ? { userRole: user.role } : {}),
+        })
+
         const [catsRes, contentRes] = await Promise.all([
-          fetch(`/api/categories?orgId=${encodeURIComponent(user.orgId)}`, {
+          fetch(`/api/categories?${search.toString()}`, {
             credentials: "include",
           }),
-          fetch(`/api/content?orgId=${encodeURIComponent(user.orgId)}`, {
+          fetch(`/api/content?${search.toString()}`, {
             credentials: "include",
           }),
         ])
@@ -124,6 +136,8 @@ export default function LearnHomePage() {
         const contentData = await contentRes.json()
 
         const catRows: any[] = catsData.categories ?? []
+        const contentRows: any[] = contentData.content ?? []
+
         setCategories(
           catRows.map((c) => ({
             id: c.id,
@@ -132,8 +146,6 @@ export default function LearnHomePage() {
             lessons: (c.lesson_count as number | null) ?? 0,
           })),
         )
-
-        const contentRows: any[] = contentData.content ?? []
 
         setContinueCourses(
           contentRows.slice(0, 5).map((c) => ({
@@ -160,6 +172,26 @@ export default function LearnHomePage() {
               type: (c.type ?? "VIDEO").toLowerCase(),
             })),
         )
+
+        if (catRows.length > 0) {
+          const first = catRows[0]
+          const categoryId = first.id
+          const lessonsInCategory = contentRows.filter(
+            (c) => c.category_id === categoryId,
+          )
+          const totalMinutes = lessonsInCategory.reduce(
+            (sum, c) => sum + (c.duration_minutes || 0),
+            0,
+          )
+          setFeaturedCategory({
+            id: categoryId,
+            name: first.name ?? "",
+            lessons: lessonsInCategory.length,
+            totalMinutes,
+          })
+        } else {
+          setFeaturedCategory(null)
+        }
       } catch (e: any) {
         console.error(e)
         setError(e?.message || "Failed to load learning content.")
@@ -216,25 +248,54 @@ export default function LearnHomePage() {
               <span className="text-[10px] font-mono text-[#FF6B35] tracking-[0.15em] uppercase">
                 Featured Training
               </span>
-              <h2 className="mt-3 max-w-[280px] text-xl font-bold leading-tight text-white">
-                Master the Art of Customer Success
-              </h2>
-              <div className="mt-3 flex gap-2">
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">
-                  12 Lessons
-                </span>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">
-                  4.2 hrs
-                </span>
-              </div>
-              <motion.button
-                className="mt-4 inline-flex h-9 items-center gap-2 rounded-full bg-gradient-to-r from-[#FF6B35] to-[#E85520] px-5 text-xs font-bold text-white shadow-lg shadow-[#FF6B35]/40"
-                whileHover={{ y: -2, boxShadow: "0 8px 24px rgba(255,107,53,0.5)" }}
-                whileTap={{ scale: 0.97 }}
-              >
-                Start Learning
-                <ArrowRight size={14} />
-              </motion.button>
+              {featuredCategory ? (
+                <>
+                  <h2 className="mt-3 max-w-[280px] text-xl font-bold leading-tight text-white">
+                    {featuredCategory.name}
+                  </h2>
+                  <div className="mt-3 flex gap-2">
+                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">
+                      {featuredCategory.lessons}{" "}
+                      {featuredCategory.lessons === 1 ? "lesson" : "lessons"}
+                    </span>
+                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">
+                      {featuredCategory.totalMinutes
+                        ? `${(featuredCategory.totalMinutes / 60).toFixed(1)} hrs`
+                        : "Duration TBA"}
+                    </span>
+                  </div>
+                  <Link href={`/learn/categories/${featuredCategory.id}`}>
+                    <motion.button
+                      className="mt-4 inline-flex h-9 items-center gap-2 rounded-full bg-gradient-to-r from-[#FF6B35] to-[#E85520] px-5 text-xs font-bold text-white shadow-lg shadow-[#FF6B35]/40"
+                      whileHover={{ y: -2, boxShadow: "0 8px 24px rgba(255,107,53,0.5)" }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      Start Learning
+                      <ArrowRight size={14} />
+                    </motion.button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <h2 className="mt-3 max-w-[280px] text-xl font-bold leading-tight text-white">
+                    Your training modules are being prepared
+                  </h2>
+                  <p className="mt-2 text-xs text-white/80 max-w-sm">
+                    Once your admin approves your access, your personalized learning paths
+                    will appear here.
+                  </p>
+                  <Link href="/learn/browse">
+                    <motion.button
+                      className="mt-4 inline-flex h-9 items-center gap-2 rounded-full bg-white/90 px-5 text-xs font-bold text-[#1C1917] shadow-lg shadow-black/10"
+                      whileHover={{ y: -2, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      Browse categories
+                      <ArrowRight size={14} />
+                    </motion.button>
+                  </Link>
+                </>
+              )}
             </div>
           </AuroraBg>
         </motion.div>
