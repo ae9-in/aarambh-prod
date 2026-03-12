@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Arambh Demo Placeholder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top, #111827 0, #020617 55%);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        color: #e5e7eb;
+      }
+      .frame {
+        width: min(640px, 100vw - 32px);
+        aspect-ratio: 16 / 9;
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: radial-gradient(circle at center, #020617 0, #020617 45%)
+          padding-box;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+        position: relative;
+        overflow: hidden;
+      }
+      .play-circle {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        width: 88px;
+        height: 88px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 30%, #f97316, #ea580c);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 16px 40px rgba(249, 115, 22, 0.6);
+        cursor: pointer;
+        transform: translateY(0);
+        transition: transform 160ms ease-out, box-shadow 160ms ease-out;
+      }
+      .play-circle:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 22px 60px rgba(249, 115, 22, 0.9);
+      }
+      .play-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        border-left: 20px solid #fefce8;
+        border-top: 12px solid transparent;
+        border-bottom: 12px solid transparent;
+        margin-left: 4px;
+      }
+      .copy {
+        position: absolute;
+        bottom: 18%;
+        width: 100%;
+        text-align: center;
+        padding-inline: 20px;
+      }
+      .headline {
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+      .sub {
+        margin-top: 6px;
+        font-size: 13px;
+        color: #9ca3af;
+      }
+      .pill {
+        margin-top: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(17, 24, 39, 0.9);
+        border: 1px solid rgba(249, 115, 22, 0.6);
+        font-size: 11px;
+        color: #fed7aa;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #f97316;
+      }
+      .glow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(
+          circle at 50% 0,
+          rgba(249, 115, 22, 0.18),
+          transparent 60%
+        );
+        mix-blend-mode: screen;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <div class="glow"></div>
+      <div class="play-circle" aria-hidden="true">
+        <div class="play-icon"></div>
+      </div>
+      <div class="copy">
+        <div class="headline">Demo Coming Soon — Join Waitlist</div>
+        <div class="sub">
+          We&apos;re recording a deep-dive walkthrough of Arambh. Be the first to
+          see it.
+        </div>
+        <div class="pill">
+          <span class="dot"></span>
+          Join the early access list inside the product
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
